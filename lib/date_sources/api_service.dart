@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_app/models/user.dart';
@@ -7,23 +8,24 @@ import 'package:user_app/resources/utils/fetch_exception.dart';
 import 'api_url.dart';
 
 class ApiServices {
-  Map<String, String> header = {
-    'Accept': '*/*',
-    //'Content-Type': 'application/json;',
-    'Accept-Encoding': 'gzip, deflate, br'
-  };
-  String accessToken = "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";
-  void addHeader() {
-    header['Authorization'] = 'Bearer ' + accessToken;
-  }
+  // Map<String, String> header = {
+  //   'Accept': '*/*',
+  //   //'Content-Type': 'application/json;',
+  //   'Accept-Encoding': 'gzip, deflate, br'
+  // };
+  // String accessToken = "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";
+  // void addHeader() {
+  //   header['Authorization'] = 'Bearer ' + accessToken;
+  // }
 
   Future<List<User>> fetchUser() async {
     List<User> listResponse = [];
     dynamic userList;
-    addHeader();
+    // addHeader();
     try {
-      var response =
-          await http.get(Uri.parse(ApiUrls().apiUserList), headers: header);
+      var response = await http.get(
+        Uri.parse(ApiUrls().apiUserList),
+      );
       final String jsonBody = response.body;
       final int statusCode = response.statusCode;
       await saveToSharedPreferences("listUser", jsonBody);
@@ -34,18 +36,18 @@ class ApiServices {
         userList = jsonDecode(jsonBody);
       }
     } on Exception catch (e) {
+      log(e.toString());
       String jsonBodyCatches = await getValueSharedPreferences("listUser");
       userList = jsonDecode(jsonBodyCatches);
-      // throw Exception(e);
     }
     listResponse = userList.map<User>((e) => User.fromJson(e)).toList();
     return listResponse;
   }
 
   Future<User> getUserDetail(int id) async {
-    addHeader();
+    //addHeader();
     String url = ApiUrls().apiUserList + "/" + id.toString();
-    var response = await http.get(Uri.parse(url), headers: header);
+    var response = await http.get(Uri.parse(url));
 
     final String jsonBody = response.body;
     final int statusCode = response.statusCode;
